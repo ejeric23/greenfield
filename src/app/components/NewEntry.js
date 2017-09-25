@@ -15,7 +15,7 @@ export class NewEntry extends React.Component {
     sentences: false };
     axios.post('api/newentry', params).
     then(response => {
-      console.log(response);
+      console.log(response.data.document_tone.tone_categories);
     }).catch(error => {
       console.log(error);
     });
