@@ -137,11 +137,19 @@ app.post("/login", function (req, res) {
     name = req.body.name;
     const password = req.body.password;
   }
-  // usually this would be a database call:
-  const user = users[_.findIndex(users, { name: name })];
-  if (!user) {
-    res.status(401).json({ message: "no such user found" });
-  }
+  // Replace fake user data with database call
+  const user = User.find({}).then((err, data) => {
+    console.log(data);
+  });
+  
+  // .complete((err, data) =>{
+  //   console.log(data);
+  // });
+  // // usually this would be a database call:
+  // const user = users[_.findIndex(users, { name: name })];
+  // if (!user) {
+  //   res.status(401).json({ message: "no such user found" });
+  // }
 
   if (user.password === req.body.password) {
     // from now on we'll identify the user by the id and the id is the only personalized value that goes into our token
