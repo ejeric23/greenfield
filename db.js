@@ -25,10 +25,6 @@ const User = db.define("User", {
     primaryKey: true,
     type: Sequelize.INTEGER
   },
-  name: {
-    type: Sequelize.STRING,
-    notEmpty: true
-  },
   username: {
     type: Sequelize.STRING,
     notEmpty: true
@@ -37,25 +33,30 @@ const User = db.define("User", {
     type: Sequelize.STRING,
     allowNull: false
   },
-  post: Sequelize.INTEGER,
-  personality: Sequelize.INTEGER,
+  personality: Sequelize.STRING,
 });
 
 const Post = db.define("Post", {
-  post: Sequelize.STRING,
-  location: Sequelize.STRING,
+  postid: {
+    autoIncrement: true,
+    primaryKey: true,
+    type: Sequelize.INTEGER
+  },
+  date: Sequelize.DATE,
+  post: Sequelize.TEXT,
   mood: Sequelize.STRING,
+  postedBy: Sequelize.INTEGER
 });
 
-const Personality = db.define("Personality", {
-  personality: Sequelize.STRING
-});
+// const Personality = db.define("Personality", {
+//   personality: Sequelize.STRING
+// });
 
 User.sync();
 Post.sync()
-Personality.sync(); 
+// Personality.sync(); 
  
  
 exports.User = User;
 exports.Post = Post;
-exports.Personality = Personality;
+// exports.Personality = Personality;
