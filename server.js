@@ -19,20 +19,6 @@ const User = require('./db.js').User;
 
 const ToneAnalyzerV3 = require('node_modules/../watson-developer-cloud/tone-analyzer/v3');
 const PersonalityInsightsV3 = require('node_modules/../watson-developer-cloud/personality-insights/v3');
-// require("dotenv").config();
-// const webpack = require('webpack');
-// const config = require('./webpack.config.js');
-// const webpackMiddleware = require('webpack-dev-middleware');
-// const compiler = webpack(config);
-// // const express = require("express");
-// const path = require("path");
-// // const app = express();
-// const mysql = require("mysql");
-// const port = process.env.PORT;
-// //const Sequelize = require("sequelize");
-// const router = express.Router();
-// const bodyParser = require("body-parser");
-// //const db = require('./db.js');
 
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
@@ -44,6 +30,15 @@ const JwtStrategy = passportJwt.Strategy;
 const _ = require("lodash");
 
 const users = require("./fakeuserdata.json");
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use('/api', router);
+
+// Serve Static Files
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// JWT/Passport auth
 
 const jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('jwt');
@@ -62,66 +57,13 @@ const strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
 
 passport.use(strategy);
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use('/api', router);
 app.use(passport.initialize());
 
-app.use(webpackMiddleware(compiler, {
-        noInfo: false,
-        quiet: false,
-        lazy: true,
-        watchOptions: {
-            aggregateTimeout: 300,
-            poll: true
-        },
-        publicPath: config.output.publicPath,  
-        index: "index.html",
-        headers: { "X-Custom-Header": "yes" },
-        stats: {
-            colors: true
-        },
-        reporter: null,
-        serverSideRender: false,
-    }));
+app.get("/secret", passport.authenticate('jwt', { session: false }), function (req, res) {
+  res.json("Success! You can not see this without a token");
+});
 
-app.use(express.static(path.join(__dirname, 'dist')));
-
-
-// app.get("/", (req, res) => {
-//   console.log("SERVING HTML");
-//   res.sendFile(__dirname + "/dist/index.html");
-// });
-// app.get("/", (req, res) => {
-//   console.log("SERVING HTML");
-//   res.sendFile(__dirname + "/dist/index.html");
-// });
-// const ToneAnalyzerV3 = require('node_modules/../watson-developer-cloud/tone-analyzer/v3');
-// var express = require("express");
-// var app = express();
-// var passport = require("passport");
-// var session = require("express-session");
-// var bodyParser = require("body-parser");
-// var env = require("dotenv").load();
-// var exphbs = require("express-handlebars");
-
-
-
-// //For BodyParser
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-
-// // For Passport 
-// app.use(session({ secret: 'keyboard cat',resave: true, saveUninitialized:true})); // session secret 
-// app.use(passport.initialize()); 
-// app.use(passport.session()); // persistent login sessions
-
-// //For Handlebars
-// app.set('views', './app/views')
-// app.engine('hbs', exphbs({
-//     extname: '.hbs'
-// }));
-// app.set('view engine', '.hbs');
+// Login and Sign Up Endpoints
 
 app.post('/signup', (req, res) => {
   User.create({
@@ -137,11 +79,11 @@ app.post("/login", function (req, res) {
     name = req.body.name;
     const password = req.body.password;
   }
-  // Replace fake user data with database call
+  // To do: replace fake data with a real database call
   const user = User.find({}).then((err, data) => {
     console.log(data);
   });
-  
+
   // .complete((err, data) =>{
   //   console.log(data);
   // });
@@ -161,42 +103,37 @@ app.post("/login", function (req, res) {
   }
 });
 
-app.get("/secret", passport.authenticate('jwt', { session: false }), function (req, res) {
-  res.json("Success! You can not see this without a token");
-});
+// Watson API
 
 const tone_analyzer = new ToneAnalyzerV3({
-    username: process.env.REACT_APP_WATSON_USERNAME,
-    password: process.env.REACT_APP_WATSON_PASSWORD,
-    version_date: '2016-05-19',
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-        'X-Watson-Learning-Opt-Out': 'true'
-    }
+  username: process.env.REACT_APP_WATSON_USERNAME,
+  password: process.env.REACT_APP_WATSON_PASSWORD,
+  version_date: '2016-05-19',
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'X-Watson-Learning-Opt-Out': 'true'
+  }
 });
 
 const personality_insights = new PersonalityInsightsV3({
-    username: process.env.REACT_APP_PERSONALITY_USERNAME,
-    password: process.env.REACT_APP_PERSONALITY_PASSWORD,
-    version_date: '2016-05-19',
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-        'X-Watson-Learning-Opt-Out': 'true'
-    }
+  username: process.env.REACT_APP_PERSONALITY_USERNAME,
+  password: process.env.REACT_APP_PERSONALITY_PASSWORD,
+  version_date: '2016-05-19',
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'X-Watson-Learning-Opt-Out': 'true'
+  }
 });
 
 app.post("/api/newentry", (req, res) => {
-  const analysis = tone_analyzer.tone(req.body, function (error, response) {if (error) {
+  const analysis = tone_analyzer.tone(req.body, function (error, response) {
+    if (error) {
       console.log('error:', error);
     } else
-    console.log(JSON.stringify(response, null, 2));
-    }
+      console.log(JSON.stringify(response, null, 2));
+  }
   );
   res.send(analysis);
-});
-
-app.get("/api/diary", (req, res) => {
-  res.send(fakedata);
 });
 
 app.post("/api/personality", (req, res) => {
@@ -207,13 +144,39 @@ app.post("/api/personality", (req, res) => {
       console.log('Personality analysis successful');
       console.log(response);
       res.send(response);
-    }  
+    }
   });
 });
 
-app.get("/api/personality_analysis", (req, res) => {
-    res.send(fakedata2);
+// Endpoints for fake data
+
+app.get("/api/diary", (req, res) => {
+  res.send(fakedata);
 });
+
+app.get("/api/personality_analysis", (req, res) => {
+  res.send(fakedata2);
+});
+
+// Misc old code we may or may not need
+
+app.use(webpackMiddleware(compiler, {
+        noInfo: false,
+        quiet: false,
+        lazy: true,
+        watchOptions: {
+            aggregateTimeout: 300,
+            poll: true
+        },
+        publicPath: config.output.publicPath,  
+        index: "index.html",
+        headers: { "X-Custom-Header": "yes" },
+        stats: {
+            colors: true
+        },
+        reporter: null,
+        serverSideRender: false,
+    }));
 
 // router.route("/posts").post((req, res) => {
 //   let post = db.Post
@@ -255,9 +218,13 @@ app.get("/api/personality_analysis", (req, res) => {
 // app.get("/", function(req, res) {
 //   res.send("Welcome to Passport with Sequelize");
 // });
+
+// Wildcard endpoint to fix routing
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'dist', 'index.html'))
 });
+
+// Listen
 app.listen(PORT, function(err) {
   if (!err) console.log(`Listening on ${PORT}`);
   else console.log(err);
