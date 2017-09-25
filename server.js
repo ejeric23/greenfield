@@ -172,9 +172,9 @@ app.post("/api/newentry", (req, res) => {
       console.log('error:', error);
     } else
     console.log(JSON.stringify(response, null, 2));
+    res.send(JSON.stringify(response, null, 2));
     }
   );
-  res.send(analysis);
 });
 
 app.get("/api/diary", (req, res) => {
