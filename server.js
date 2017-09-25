@@ -6,14 +6,16 @@ const compiler = webpack(config);
 const express = require("express");
 const path = require("path");
 const app = express();
-// const mysql = require("mysql");
+const mysql = require("mysql");
 const PORT = process.env.PORT;
-//const Sequelize = require("sequelize");
+const Sequelize = require("sequelize");
 const router = express.Router();
 const bodyParser = require("body-parser");
-//const db = require('./db.js');
+const db = require('./db.js');
 const fakedata = require('./fakedata.json');
 const fakedata2 = require('./fakedata2.json');
+
+const User = require('./db.js').User;
 
 const ToneAnalyzerV3 = require('node_modules/../watson-developer-cloud/tone-analyzer/v3');
 const PersonalityInsightsV3 = require('node_modules/../watson-developer-cloud/personality-insights/v3');
@@ -121,6 +123,14 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // }));
 // app.set('view engine', '.hbs');
 
+app.post('/signup', (req, res) => {
+  User.create({
+    username: req.body.username,
+    password: req.body.password,
+    personality: null
+  });
+});
+
 app.post("/login", function (req, res) {
   let name = '';
   if (req.body.name && req.body.password) {
@@ -219,7 +229,7 @@ app.get("/api/personality_analysis", (req, res) => {
 //   res.send('Post Working');
 // })
 //Models
-var models = require("./app/models");
+// var models = require("./app/models");
 
 //Routes
 // var authRoute = require('./app/routes/auth.js')(app,passport);
