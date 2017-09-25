@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 export class SignUp extends React.Component {
   constructor(props) {
@@ -27,6 +28,11 @@ export class SignUp extends React.Component {
   // Process the form
   processForm(event) {
     event.preventDefault();
+    axios.post('/signup', this.state.user).then(response => {
+      console.log(response);
+    }).catch(error => {
+      console.log(error);
+    });
   }
   render() {
     return (

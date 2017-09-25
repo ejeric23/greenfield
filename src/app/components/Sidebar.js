@@ -54,7 +54,7 @@ export class Sidebar extends React.Component {
           (<NavLink to="/loginform">Login</NavLink>) }
         </div>
         <div className="row">
-          {Auth.isUserAuthenticated() ? (' ') : (<NavLink to="/signup">Sign Up</NavLink>)}
+          {Auth.isUserAuthenticated() ? (' ') : (<NavLink to="/signupform">Sign Up</NavLink>)}
         </div>
       </div>
     );
