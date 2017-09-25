@@ -32,8 +32,8 @@ class App extends React.Component {
               <Route path="/newentry" component={NewEntry} />
               <Route path="/diary" component={Diary} />
               <Route path="/loginform" component={Login} />
-              {/* <Route path="/signup" component={SignUp} />
-              <Route path="/" render={(props)} /> */}
+              <Route path="/signupform" component={SignUp} />
+              {/* <Route path="/" render={(props)} /> */}
             </Switch>
           </div>
           <div className="sidebar" className="col-xl-2 col-lg-2 col-md-3 col-sm-3">
