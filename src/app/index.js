@@ -21,12 +21,11 @@ class App extends React.Component {
   render() {
     return (
       <div className="container-fluid">
-        <div className="row" className="staticheader" classname="col-12">
-          LifeData
+        <div className="row" className="staticheader">
+          Visual Life
         </div>
         <div className="row">
           <div className="main" className="col-xl-10 col-lg-10 col-md-9 col-sm-9">
-            {/* {Auth.isUserAuthenticated() ? (<p>Logged In</p>) : (<p>Not Logged In</p>)} */}
             <Switch>
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/settings" component={Settings} />
@@ -35,8 +34,7 @@ class App extends React.Component {
               <Route path="/newentry" component={NewEntry} />
               <Route path="/diary" component={Diary} />
               <Route path="/loginform" component={Login} />
-              {/* <Route path="/signup" component={SignUp} />
-              <Route path="/" render={(props)} /> */}
+              <Route path="/signup" component={SignUp} />
             </Switch>
           </div>
           <div className="sidebar" className="col-xl-2 col-lg-2 col-md-3 col-sm-3">
